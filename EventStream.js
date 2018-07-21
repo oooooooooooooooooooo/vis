@@ -112,6 +112,14 @@ class EventStream {
                 res = res.concat(this.securities[target_security].get())
             }
 
+            var table_html = "<th scope = 'col'>Time</th><th scope = 'col'>Order</th><th scope = 'col'>Quantity</th><th scope = 'col'>Price</th>";
+
+            //update ui table
+            for (transaction_item in res){
+                table_html += "<tr><td>"+this.current_time+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['price']+"</td></tr>";
+            }
+            $.('#transaction_table').html = table_html;
+
             //return collection
             return res;
         } else return -1;
@@ -129,6 +137,14 @@ class EventStream {
                 res = res.concat(this.securities[target_security].get())
             }
 
+
+            var table_html = "<th scope = 'col'>Time</th><th scope = 'col'>Order</th><th scope = 'col'>Quantity</th><th scope = 'col'>Price</th>";
+
+            //update ui table
+            for (transaction_item in res){
+                table_html += "<tr><td>"+this.current_time+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['price']+"</td></tr>";
+            }
+            $.('#transaction_table').html = table_html;
             //return collection
             return res;
         } else return -1;
