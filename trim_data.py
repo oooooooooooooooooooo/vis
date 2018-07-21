@@ -33,7 +33,6 @@ def main(*args):
 			pass
 		del record['msg_seq_num']
 		del record['tick_seq']
-		del record['security_id']
 		del record['epochs']
 		try:
 			del record['match_event_indicator']
