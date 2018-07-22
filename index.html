@@ -20,7 +20,9 @@
           for(const event of window.data) {
             book.handle(event);
           }
+          const geometries = book.exportGeometry();
           window.book = book;
+
 
             var stream = new EventStream();
             stream.load(window.data);

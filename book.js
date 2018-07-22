@@ -41,7 +41,7 @@ class Level {
 	}
 
 	exportGeometry(geometries, px_scale) {
-		const x = 0;
+		let x = 0;
 		const half_scale = px_scale * .5;
 		for(const order of this.orders) {
 			const plane = new THREE.PlaneGeometry(order.qty, px_scale);
