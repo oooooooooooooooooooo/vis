@@ -15,25 +15,29 @@ class TransactionTimestamp {
 class SecurityStream {
     //stream of events for given security
     constructor(){
-        this.transactions = [];
-        this.timestamps = [];
+        this.transactions = {};
+        this.timestamps = {};
         this.current = -1;
+		this.max;
+		this.min;
     }
 
     load(trans_in){
         //load transactions for given time
 
         //lookup for epoch
-        if (!(trans_in.epoch in transactions)){
+        if (!(trans_in.epoch in this.transactions)){
             //generate new epoch entry for new epoch and load contents and add timestamp entry
             this.transactions[trans_in.epoch] = [];
             this.timestamps[trans_in.epoch] = new TransactionTimestamp();
             if (this.current == -1){
                 this.current = trans_in.epoch;
-                this.timestamps[trans_in.epoch].prev = -1;
+				this.min = trans_in.epoch;
+				this.max = trans_in.epoch;
             } else {
-                this.timestamps[trans_in.epoch].prev = this.current;
-                this.timestamps[this.current].next = trans_in.next;
+                this.timestamps[trans_in.epoch].prev = this.max;
+                this.timestamps[this.max].next = trans_in.epoch;
+				this.max = trans_in.epoch;
             }
         }
         this.transactions[trans_in.epoch].push(trans_in);
@@ -68,8 +72,8 @@ class SecurityStream {
 class EventStream {
     //Containter class of streams per security_id
     constructor() {
-        this.securities = [];
-        this.global_timestamps = [];
+        this.securities = {};
+        this.global_timestamps = {};
         this.current_time = -1;
         this.max_time = -1;
         this.min_time = -1;
@@ -77,8 +81,9 @@ class EventStream {
 
 
     load(trans_book){
-        for (transaction_entry in trans_book){
-
+        for (var i = 0; i<trans_book.length; i++){
+			var transaction_entry = trans_book[i];
+			transaction_entry['security_id'] = 100;
             //construct for new security_id
             if(!(transaction_entry.security_id in this.securities)){
                 this.securities[transaction_entry.security_id] = new SecurityStream();
@@ -108,17 +113,20 @@ class EventStream {
             this.current_time = this.global_timestamps[this.current_time].next;
 
             //get all transactions for each security_id in timestamp
-            for (target_security in this.global_timestamps[this.current_time].target){
-                res = res.concat(this.securities[target_security].get())
+            for (var i = 0; i < this.global_timestamps[this.current_time].target.length; i++){
+                var target_security = this.global_timestamps[this.current_time].target[i];
+				res = res.concat(this.securities[target_security].get())
+				this.securities[target_security].next();
             }
 
             var table_html = "<th scope = 'col'>Time</th><th scope = 'col'>Order</th><th scope = 'col'>Quantity</th><th scope = 'col'>Price</th>";
+			$('#transaction_table').html(table_html);
 
             //update ui table
-            for (transaction_item in res){
-                table_html += "<tr><td>"+this.current_time+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['price']+"</td></tr>";
+            for (var i = 0; i<res.length; i++){
+				var transaction_item = res[i];
+				$('#transaction_table').append("<tr><td>"+ (this.current_time % 10000000)+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['px']+"</td></tr>");
             }
-            $.('#transaction_table').html = table_html;
 
             //return collection
             return res;
@@ -133,19 +141,23 @@ class EventStream {
             this.current_time = this.global_timestamps[this.current_time].prev;
 
             //get all transactions for each security_id in timestamp
-            for (target_security in this.global_timestamps[this.current_time].target){
-                res = res.concat(this.securities[target_security].get())
+            for (var i = 0; i < this.global_timestamps[this.current_time].target.length; i++){
+                var target_security = this.global_timestamps[this.current_time].target[i];
+				res = res.concat(this.securities[target_security].get())
+				this.securities[target_security].prev();
             }
 
 
             var table_html = "<th scope = 'col'>Time</th><th scope = 'col'>Order</th><th scope = 'col'>Quantity</th><th scope = 'col'>Price</th>";
 
+			$('#transaction_table').html(table_html);
+
             //update ui table
-            for (transaction_item in res){
-                table_html += "<tr><td>"+this.current_time+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['price']+"</td></tr>";
+            for (var i = 0; i<res.length; i++){
+				var transaction_item = res[i];
+				$('#transaction_table').append("<tr><td>"+ this.current_time+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['px']+"</td></tr>");
             }
-            $.('#transaction_table').html = table_html;
-            //return collection
+			//return collection
             return res;
         } else return -1;
     }

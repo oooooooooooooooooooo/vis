@@ -52,7 +52,8 @@ class Level {
 	}
 
 	print() {
-		console.log('' + this.raw_px + ' [' + this.orders.map(order => order.qty).join(' ') + ']');
+		//console.log('' + this.raw_px + ' [' + this.orders.map(order => order.qty).join(' ') + ']');
+		console.log('' + this.raw_px + ' [' + this.orders.map(order => 'X'.repeat(order.qty/50)).join('') + ']');
 	}
 }
 
