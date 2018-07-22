@@ -128,7 +128,6 @@ class EventStream {
 				$('#transaction_table').append("<tr><td>"+ (this.current_time % 10000000)+"</td><td>"+transaction_item['side']+"</td><td>"+transaction_item['qty']+"</td><td>"+transaction_item['px']+"</td></tr>");
             }
 
-
             //return collection
             return res;
         } else return -1;
@@ -150,6 +149,7 @@ class EventStream {
 
 
             var table_html = "<th scope = 'col'>Time</th><th scope = 'col'>Order</th><th scope = 'col'>Quantity</th><th scope = 'col'>Price</th>";
+
 			$('#transaction_table').html(table_html);
 
             //update ui table
