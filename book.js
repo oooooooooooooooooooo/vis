@@ -40,6 +40,17 @@ class Level {
 		return this.orders.length === 0;
 	}
 
+	exportGeometry(geometries, px_scale) {
+		let x = 0;
+		const half_scale = px_scale * .5;
+		for(const order of this.orders) {
+			const plane = new THREE.PlaneGeometry(order.qty, px_scale);
+			plane.translate(x, order.raw_px + half_scale);
+			geometries.push(plane);
+			x += order.qty;
+		}
+	}
+
 	print() {
 		console.log('' + this.raw_px + ' [' + this.orders.map(order => order.qty).join(' ') + ']');
 	}
@@ -106,6 +117,12 @@ class Side {
 		for(const level of this.levels)
 			level.print()
 	}
+
+	exportGeometry(geometries, px_scale) {
+		this.levels.sort(this.cmp);
+		for(const level of this.levels)
+			level.exportGeometry(geometries, px_scale);
+	}
 }
 
 class Book {
@@ -120,6 +137,13 @@ class Book {
 		this.ask.print();
 		console.log('---------------------')
 		this.bid.print();
+	}
+
+	exportGeometry() {
+		const geometries = [];
+		this.bid.exportGeometry(geometries, this.secdef.tickSizes[0].tickSize);
+		this.ask.exportGeometry(geometries, this.secdef.tickSizes[0].tickSize);
+		return geometries;
 	}
 
 	handle(record) {
@@ -154,6 +178,5 @@ class Book {
 			case 'D':
 				break;
 		}
-
 	}
 }

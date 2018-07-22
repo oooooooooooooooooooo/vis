@@ -1,23 +1,30 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js" crossorigin="anonymous"></script>
 
     <script src = "1k.js"></script>
     <script src = "sid.js"></script>
     <script src = "book.js"></script>
     <script src = "EventStream.js"></script>
+
     <script>
 
         //Test code here
         window.onload = function(){
 
-          const book = new Book();
+          const book = new Book(window.securities[0]);
           for(const event of window.data) {
             book.handle(event);
           }
+          const geometries = book.exportGeometry();
           window.book = book;
 
-            var stream = new EventStream(window.securities);
+
+            var stream = new EventStream();
             stream.load(window.data);
             window.stream = stream;
         }
@@ -31,7 +38,7 @@
   <body>
     <div class = 'container-fluid'>
         <div class = 'row'>
-            <div class = 'col-1'>
+            <div class = 'col-5'>
                 <table class="table table-sm table-dark" id = 'transaction_table'>
                     <th scope = 'col'>Time</th>
                     <th scope = 'col'>Order</th>
@@ -45,8 +52,8 @@
                     </tr>
                 </table>
             </div>
-            <div class = 'col-5'>
-                <img src = 'https://i.imgur.com/Sibekhc.jpg'></img>
+            <div class = 'col-7' script="max-width= 100px">
+                <!-- <img src = 'https://i.imgur.com/Sibekhc.jpg'></img> -->
                 <!-- canvas goes here-->
                 <script src="three.js-master/build/three.js"></script>
                 <script src="three.js-master/examples/js/controls/OrbitControls.js"></script>
@@ -58,12 +65,14 @@
             </div>
         </div>
         <div class = 'row'>
-            <form>
-              <div class="form-group">
-                <label for="formControlRange">Time Range</label>
-                <input type="range" class="form-control-range" id="formControlRange">
-              </div>
-            </form>
+            <div class = 'col-12'>
+                <form>
+                  <div class="form-group">
+                    <label for="formControlRange">Time Range</label>
+                    <input type="range" class="form-control-range" id="formControlRange">
+                  </div>
+                </form>
+            </div>
         </div>
     </div>
   </body>

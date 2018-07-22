@@ -2,9 +2,10 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var group, camera, scene, renderer;
-jsonRead();
-// init();
-// animate();
+// const readFile = 'something.js'
+// jsonRead(readFile);
+init();
+animate();
 
 function init() {
 
@@ -73,8 +74,25 @@ function init() {
 
 
 
-  addData(x, y, z, pointsMaterial, group, meshMaterial, i);
+  // addData(x, y, z, pointsMaterial, group, meshMaterial, i);
+  const shape = new THREE.BoxGeometry(x,y,z);
+  shape.translate( (x/2), (y/2), (z/2) );
 
+  const points = new THREE.Points( shape, pointsMaterial );
+  group.add( points );
+
+  // convex hull
+  const meshGeometry = new THREE.ConvexBufferGeometry( shape.vertices );
+
+  var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+  mesh.material.side = THREE.BackSide; // back faces
+  mesh.renderOrder = 0;
+  group.add( mesh );
+
+  var mesh = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
+  mesh.material.side = THREE.BackSide; // back faces
+  mesh.renderOrder = 1;
+  group.add( mesh );
   //
 
   window.addEventListener( 'resize', onWindowResize, false );
@@ -134,7 +152,27 @@ function addData( x, y, z, pointsMaterial, group, meshMaterial, i) {
 }
 
 function jsonRead(file) {
-  const book = window.book;
-  console.log(book);
-  // return JSON.parse(file);
+  var obj = JSON.parse(file);
+  var loader = new THREE.JSONLoader();
+  loader.load(
+  	// resource URL
+  	obj,
+
+  	// onLoad callback
+  	function ( geometry, materials ) {
+  		var material = materials[ 0 ];
+  		var object = new THREE.Mesh( geometry, material );
+  		scene.add( object );
+  	},
+
+  	// onProgress callback
+  	function ( xhr ) {
+  		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+  	},
+
+  	// onError callback
+  	function( err ) {
+  		console.log( 'An error happened' );
+  	}
+  );
 }
